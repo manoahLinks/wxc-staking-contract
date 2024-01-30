@@ -1,7 +1,12 @@
 // SPDX-License-Identifier: SEE LICENSE IN LICENSE
 pragma solidity ^0.8.9;
 
-contract Erc20 {
+interface IERC20 {
+    function getUserBalance (address _addr) external view returns (uint);
+    function transferFrom (address _sender, address _recepient, uint _amount) external ;
+}
+
+contract Erc20 is IERC20{
     // state variables
     string public tokenName;
     string public symbol;
@@ -39,7 +44,9 @@ contract Erc20 {
 
     //allowance mapping
 
-    
+    function getUserBalance (address _addr) override public view returns (uint) {
+        return balanceOf[_addr];
+    }
 
     /// ADD CHECKS TO OWNER
     modifier onlyOwner {
@@ -85,7 +92,7 @@ contract Erc20 {
         emit approval(msg.sender, _spender, _amount);
     } 
     // transferFrom function: it can only be called from outside the contract
-    function transferFrom (address _sender, address _recepient, uint _amount) external{
+    function transferFrom (address _sender, address _recepient, uint _amount) override external{
         // subtract amount from the spender and give allowance to recepient
         allowance[_sender][_recepient]  -= _amount;
         // subtract amount from the balance of the sender
@@ -93,7 +100,7 @@ contract Erc20 {
 
         //adding the amount to the balance of the recepient
         balanceOf[_recepient] += _amount;
-        
+
         //emitting the transfer event
         emit transferEvent(_recepient, _sender, _amount);
     }
